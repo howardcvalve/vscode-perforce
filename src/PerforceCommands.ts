@@ -4,7 +4,7 @@ import {
     commands, workspace, window, Uri,
     ThemableDecorationAttachmentRenderOptions, DecorationInstanceRenderOptions, DecorationOptions,
     OverviewRulerLane, Disposable, ExtensionContext, Range, QuickPickItem,
-    TextDocument, TextEditor, TextEditorSelectionChangeEvent, WorkspaceFolder } from 'vscode';
+    TextDocument, TextEditor, TextEditorSelectionChangeEvent, WorkspaceFolder, MarkdownString } from 'vscode';
 
 import * as Path from 'path';
 import * as fs from 'fs';
@@ -242,7 +242,7 @@ export namespace PerforceCommands
             const matches = annotations[i].match(usr ? /^(\d+): (\S+ \S+)/ : /^(\d+): /);
             if(matches) {
                 const num = matches[1];
-                const hoverMessage = matches[2];
+                const hoverMessage = new MarkdownString(`[${num + ' ' + matches[2]}](http://swarm.valve.org/changes/${num})`);
 
                 if (num !== lastNum) {
                     lastNum = num;
