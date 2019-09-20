@@ -8,6 +8,7 @@ import { Status } from './Status';
 import * as Path from 'path';
 import * as vscode from 'vscode';
 import { fileSync } from 'tmp';
+import * as os from 'os';
 
 function isResourceGroup(arg: any): arg is SourceControlResourceGroup {
     return arg.id !== undefined;
@@ -115,7 +116,7 @@ export class Model implements Disposable {
                 newSpec += 'Files:\n\t';
                 const fileListStr = field.substring(8); // remove prefix Files:\n\t
 
-                const depotFiles = fileListStr.split("\n").map(file => {
+                const depotFiles = fileListStr.split(os.EOL).map(file => {
                     const endOfFileStr = file.indexOf('#'); 
                     return file.substring(0, endOfFileStr).trim();;
                 });
@@ -137,7 +138,7 @@ export class Model implements Disposable {
             } 
             else if (field.startsWith('Description:')) {
                 newSpec += 'Description:\n\t';
-                newSpec += descStr.trim().split('\n').join('\n\t');
+                newSpec += descStr.trim().split(os.EOL).join('\n\t');
                 newSpec += '\n\n';
             } else {
                 newSpec += field;
@@ -236,7 +237,7 @@ export class Model implements Disposable {
             return;
         }
 
-        const fileList = fileListStr.split("\n").map(file => {
+        const fileList = fileListStr.split(os.EOL).map(file => {
             const endOfFileStr = file.indexOf('#');
             return file.substring(0, endOfFileStr);
         });
@@ -507,7 +508,7 @@ export class Model implements Disposable {
 
         const pendingArgs = '-c ' + this._infos.get('Client name') + ' -s pending';
         let output: string = await Utils.runCommand(this._workspaceUri, 'changes', null, null, pendingArgs);
-        let changelists = output.trim().split('\n');
+        let changelists = output.trim().split(os.EOL);
 
         const config = workspace.getConfiguration('perforce');
         const maxFilePerCommand: number = config.get<number>('maxFilePerCommand');
@@ -613,7 +614,7 @@ export class Model implements Disposable {
     private async getDepotOpenedFilePaths(): Promise<string[]> {
         let resource = Uri.file(this._config.localDir);
         const output = await Utils.getSimpleOutput(resource, 'opened');
-        const opened = output.trim().split('\n');
+        const opened = output.trim().split(os.EOL);
         if (opened.length === 0) {
             return;
         }
@@ -632,7 +633,7 @@ export class Model implements Disposable {
     private async getDepotShelvedFilePaths(chnum: number): Promise<string[]> {
         let resource = Uri.file(this._config.localDir);
         const output = await Utils.getSimpleOutput(resource, 'describe -Ss ' + chnum);
-        const shelved = output.trim().split('\n');
+        const shelved = output.trim().split(os.EOL);
         if (shelved.length === 0) {
             return;
         }
